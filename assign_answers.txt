@@ -1,0 +1,63 @@
+  1. What's a RubyGem and why would you use one?
+  Ruby gems are programs or libraries of code in a specific file structure that is used to extend or modify Ruby applications.
+  They are made reusable, portable, and sharable by using the RubyGem package manager to load desired gems into a Ruby application.
+
+2. What’s the difference between lazy and eager loading?
+  Lazy loading is when we delay the loading of data until we need it.
+
+  Eager loading is when we load the all objects/processes immediately.
+  This may improve speed and is used to optimize performance.
+
+  A process should utilize lazy loading when it is not certain if a user (or another process) will make use of that process. It should utilize eager loading if it is known that the process will definitely be used.
+
+3. What’s the difference between CREATE TABLE and INSERT INTO sql statements
+
+  CREATE TABLE – actually creates a new table with the tablename provided.
+  INSERT INTO – inserts new row in the existing table with the tablename provided.
+
+4. What’s the difference between extend and include? When would you use one or the other?
+
+  When using "include" on a module, inside a class we allow the class to access the module's methods as instance methods.
+  When using "extend" on a module, inside a class we allow the class to access the module's methods as class methods.
+
+  If a method within a module needed to be called on a specific instance of a class, then the module should be "include"-d.
+  Otherwise, the module should be "extend"-ed.
+
+
+5. In persistence.rb, why do the save methods need to be instance instead of class methods?
+  Save methods are called on specific instances of the classes, because the save method is taking the changes made to the attributes of an instance and persisting them to the database.
+
+6. Given the Jar-Jar Binks example, what is the final SQL query in persistence.rb’s save! method?
+
+  UPDATE character
+  SET character_name = "Jar-Jar Binks", star_rating = 1
+  WHERE id = 1
+
+
+7. AddressBook’s entries instance variable no longer returns anything. We’ll fix this later. What changes will be needed?
+ Either initialize those variables or point the variables to the values in the db.
+
+Programming Questions
+
+1. Write a Ruby method that converts snake_case to CamelCase using regular expressions
+
+  def camelize(snake_word)
+    snake_word.gsub!(/_[a-z]/, &:upcase)
+    snake_word.gsub(/(_)([A-Z])/, '\2')
+  end
+
+2. Add a select method which takes an attribute and value and searches for all records that match.
+
+Assuming you have an AddressBook, it might get called like this:
+    myAddressBook = AddressBook.find_by(“name”, “My Address Book”)
+Use a SELECT…WHERE sql query and return an array of objects to the caller.
+
+  def find_by(attribute, value)
+    row = connection.execute(<<-SQL)
+      SELECT * FROM #{table}
+      WHERE #{attribute} = #{BlocRecord::Utility.sql_strings(value)};
+    SQL
+
+    data = Hash[columns.zip(row)]
+    new(data)
+  end

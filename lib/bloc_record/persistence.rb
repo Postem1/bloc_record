@@ -10,6 +10,7 @@ module Persistence
 
   def save
     self.save! rescue false
+    # If an error occurs returns false.  Save unsuccessful.
   end
 
   def save!
@@ -26,7 +27,6 @@ module Persistence
       SET #{fields}
       WHERE id = #{self.id};
     SQL
-
     true
   end
 
