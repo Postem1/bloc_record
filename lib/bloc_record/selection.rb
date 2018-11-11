@@ -152,18 +152,24 @@ module Selection
   end
 
   def order(*args)
-    if args.count > 1
-      order = args.join(",")
-    else
-      order = args.first.to_s
+    orderArray = []
+    args.each do |arg|
+      case arg
+        when String
+          orderArray << arg
+        when Symbol
+          orderArray << arg.to_s
+        when Hash
+          orderArray << arg.map{|key, value| "#{key} #{value}"}
+      end
     end
-    # If the order local variable is a Symbol, to_s will convert it to a string
+    order = orderArray.join(",")
 
     rows = connection.execute <<-SQL
       SELECT * FROM #{table}
       ORDER BY #{order};
     SQL
-
+    
     rows_to_array(rows)
   end
 
@@ -179,11 +185,22 @@ module Selection
         rows = connection.execute <<-SQL
           SELECT * FROM #{table} #{BlocRecord::Utility.sql_strings(args.first)};
         SQL
+
       when Symbol
         rows = connection.execute <<-SQL
           SELECT * FROM #{table}
           INNER JOIN #{args.first} ON #{args.first}.#{table}_id = #{table}.id
         SQL
+
+      when Hash
+        key = args.first.keys.first
+        value = args.first[key]
+        rows = connection.execute <<-SQL
+          SELECT * FROM #{table}
+          INNER JOIN #{key} ON #{key}.#{table}_id = #{table}.id
+          INNER JOIN #{value} ON #{value}.#{key}_id = #{key}.id
+        SQL
+
       end
     end
 
@@ -209,3 +226,8 @@ end
 # a = [ 4, 5, 6 ]
 # b = [ 7, 8, 9 ]
 # [1,2,3].zip(a, b)      #=> [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+
+# SELECT department.department_name, AVG(compensation.vacation_days) FROM department
+#    ...> JOIN professor ON department.id = professor.department_id
+#    ...> JOIN compensation ON professor.id = compensation.professor_id
+#    ...> GROUP by department.department_name;
