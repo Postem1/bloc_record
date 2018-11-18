@@ -169,7 +169,7 @@ module Selection
       SELECT * FROM #{table}
       ORDER BY #{order};
     SQL
-    
+
     rows_to_array(rows)
   end
 
@@ -218,9 +218,10 @@ module Selection
   end
 
   def rows_to_array(rows)
-    rows.map { |row| new(Hash[columns.zip(row)]) }
+    collection = BlocRecord::Collection.new
+    rows.each { |row| collection << new(Hash[columns.zip(row)]) }
+    collection
   end
-
 end
 
 # a = [ 4, 5, 6 ]
