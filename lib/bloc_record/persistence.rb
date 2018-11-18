@@ -34,8 +34,14 @@ module Persistence
     self.class.update(self.id, { attribute => value })
   end
 
-  def update_attributes(updates) # Update Multiple Attributes of an Instance 
-     self.class.update(self.id, updates)
+  def update_attributes(updates) # Update Multiple Attributes of an Instance
+    self.class.update(self.id, updates)
+  end
+
+  def method_missing(m, *args)
+    attribute = m.to_s
+    attribute.slice!("update_")
+    update_attribute(attribute, args[0])
   end
 
 
@@ -58,6 +64,13 @@ module Persistence
     end
 
     def update(ids, updates) # updates multiple attributes
+
+      # update multiple records
+      if ids.class == Array && updates.class == Array
+        ids.each_with_index { |val, index| update(val, updates(index)) }
+        true
+      end
+
       updates = BlocRecord::Utility.convert_keys(updates)
       updates.delete "id"
 
