@@ -19,9 +19,14 @@ module BlocRecord
      self.select { |obj| obj[attr] == arg[attr] }
    end
 
-   def not(arg)
-    attr = arg.keys[0]
-    self.select { |obj| obj[attr] != arg[attr] }
+    def not(arg)
+      attr = arg.keys[0]
+      self.select { |obj| obj[attr] != arg[attr] }
+    end
+
+    def destroy_all
+      ids = self.map(&:id)
+     self.any? ? self.first.class.destroy(ids) : false
     end
 
   end
