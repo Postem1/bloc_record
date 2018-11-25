@@ -15,14 +15,13 @@ module BlocRecord
     end
 
     def where(arg)
-     attr = arg.keys[0]
-     self.select { |obj| obj[attr] == arg[attr] }
-   end
-
-   def not(arg)
-    attr = arg.keys[0]
-    self.select { |obj| obj[attr] != arg[attr] }
+      attr = arg.keys[0]
+      self.select { |obj| obj[attr] == arg[attr] }
     end
 
+    def not(arg)
+      attr = arg.keys[0]
+      self.select { |obj| obj[attr] != arg[attr] }
+    end
   end
 end
